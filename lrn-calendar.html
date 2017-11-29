@@ -1,0 +1,34 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`lrn-calendar`
+A LRN element
+
+@demo demo/index.html
+-->
+
+<dom-module id="lrn-calendar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>[[title]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'lrn-calendar',
+
+      properties: {
+        title: {
+          type: String,
+          value: 'lrn-calendar',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
