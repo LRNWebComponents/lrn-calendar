@@ -1,4 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../materializecss-styles/colors.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../../lrn-calendar-date.html">
+<script src="main.js"></script>
 
 <!--
 `lrn-calendar`
@@ -7,17 +14,63 @@ A LRN element
 @demo demo/index.html
 -->
 
+<script type="text/javascript" src="https://rawgit.com/mozilla-comm/ical.js/master/build/ical.js"></script>
+
+
 <dom-module id="lrn-calendar">
   <template>
     <style>
       :host {
         display: block;
       }
+      lrn-calendar-date{
+        display: inline-table;
+        top: 0px;
+      }
+      paper-card {
+        width: 14%;
+        height: 20px;
+        display: inline-table;
+        padding: 0;
+        margin: 0;
+      }
     </style>
-    <h2>[[title]]</h2>
+
+    <div class="calendar">
+      <div class="testing">
+
+        <h1>{{date}}</h1>
+        <!--<canvas class="test-view"></canvas> -->
+      </div>
+      <!--<form method="post" action="#" onsubmit="return validate()">
+      <h1>iCalendar / jCal Validator</h1>
+      <p id="descr">This validator form takes either iCalendar or jCal data. iCalendar data will be parsed to jCal and re-serialized to iCalendar. Similarly, jCal data will be parsed to iCalendar and re-serialized to jCal.</p>
+      <textarea id="data" rows="20" cols="80"></textarea><br/>
+      <input type="submit" value="Validate" /><br/>
+      <p id="duration"></p>
+      <hr>
+      <pre id="error"></pre>
+      <div id="jcalbox" style="display: none">
+        <h2>jCal Representation</h2>
+        <pre id="jcal"></pre>
+        <hr>
+      </div>
+      <div id="icalbox" style="display: none">
+        <h2>iCalendar Representation</h2>
+        <pre id="ical"></pre>
+      </div>
+    </form> -->
+    </div>
+
+
+
+    
+
   </template>
 
+
   <script>
+
     Polymer({
 
       is: 'lrn-calendar',
@@ -27,6 +80,70 @@ A LRN element
           type: String,
           value: 'lrn-calendar',
         },
+        date:{
+          type: Date,
+        },
+        numweeks: {
+          type: Number,
+          value: 1
+        },
+        weekdaysonly: {
+          type: Boolean,
+          value: false,
+        },
+        view:{
+          type: String,
+          value: "month",
+        },
+        
+      },
+      ready: function() {
+
+        this.createCalendar();
+
+
+
+      },
+      attached: function() {
+        this._initializeReader();
+
+      },
+
+      _initializeReader: function() {
+        this.instance = new Polymer.Reader(this);
+        this.instance.startMonth = this.date.getMonth() + 1;
+        this.instance.startYear = this.date.getFullYear();
+        this.instance.startDay = this.date.getDate();
+        this.instance.startDayOfWeek = this.date.getDay();
+        this.instance.currentDate = this.startDay;
+        this.instance.currentMonth = this.startMonth;
+        this.instance.currentYear = this.startYear;
+        this.instance.currentDayofWeek = this.startDayOfWeek;
+        this.instance.totalDays = (this.numweeks * 7);
+        this.instance.view = this.view;
+        this.instance.calendarText = this.instance.readTextFile('sample.ics');
+        this.instance.createCalendar();
+      },
+
+      createCalendar: function() {
+        this.startMonth = this.date.getMonth() + 1;
+        this.startYear = this.date.getFullYear();
+        this.startDay = this.date.getDate();
+        this.startDayOfWeek = this.date.getDay();
+        this.currentDate = this.startDay;
+        this.currentMonth = this.startMonth;
+        this.currentYear = this.startYear;
+        this.currentDayofWeek = this.startDayOfWeek;
+        this.totalDays = (this.numweeks * 7);
+        this.calendarText = "hello";
+        var days = 1;
+        var pastDate = 0;
+
+        
+
+          
+        
+        
       },
 
     });

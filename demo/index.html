@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>lrn-calendar demo</title>
+    <title>lrn-calendar-date demo</title>
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
@@ -16,11 +16,20 @@
     </style>
   </head>
   <body>
-    <div class="vertical-section-container centered">
+    <div class="vertical-section-container">
       <h3>Basic lrn-calendar demo</h3>
       <demo-snippet>
         <template>
-          <lrn-calendar></lrn-calendar>
+          <!--
+            start = day,month,year ex:12/4/2017
+            5-week? = true or false
+            NumWeeks to display: Num ex: 2
+          -->
+          <lrn-calendar date="2018/7/22"  weekdaysonly view="month">
+          <!-- February 2004 2032 fix and 2060 (Just month view) -->
+          <!--Days where first of month is on Sunday -->
+
+          </lrn-calendar>
         </template>
       </demo-snippet>
     </div>

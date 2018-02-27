@@ -1,0 +1,128 @@
+<!--<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../materializecss-styles/colors.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html"> 
+
+month-week-calendar
+-->
+
+<script type="text/javascript" src="https://rawgit.com/mozilla-comm/ical.js/master/build/ical.js"></script>
+<!--
+`patrick-test`
+A LRN element
+
+@demo demo/index.html
+-->
+
+<dom-module id="lrn-calendar-date">
+  <template>
+    <style include="materializecss-styles-colors">
+      :host {
+        display: block;
+      }
+      .paper-card {
+        width: 100%;
+        height: 200px;
+        vertical-align: top;
+      }
+      .card-content{
+        height: 2px;
+        top: -20px;
+      }
+
+    </style>
+    <body class="main">
+      <div id="test">
+        <paper-card class="paper-card">
+          <template is="dom-if" if="[[firstWeek]]">
+            <h2>[[getWeek(date)]]</h2>
+          </template>
+          
+            <h3> [[getMonth(date)]] </h3>
+          
+          <template is="dom-repeat" items="{{events}}">
+            <div class = "card-content" style="color:{{item.color}}">
+              <div><span>{{item.event}}</span></div>
+            </div>
+          </template>
+        </paper-card>
+      </div>
+    </body>
+
+
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'lrn-calendar-date',
+
+      /*ready: function() {
+          this.events = [
+            {first: 'Bob', last: 'Smith'},
+            {first: 'Sally', last: 'Johnson'},
+          ];
+        }, */
+
+      properties: {
+        title: {
+          type: String,
+          value: 'lrn-calendar-date',
+        },
+        name: {
+          type: String,
+
+        },
+        date: {
+          type: Date,
+          
+        },
+        firstWeek: {
+          type: Boolean
+        },
+        valid: {
+          type: Boolean,
+          value: false,
+        },
+        
+        events: {
+          type: Array,
+          value:function() {
+            return[];
+          /*this.events = [
+            {first: 'Sam', last: 'Smith'},
+            {first: 'Juwan', last: 'Johnson'},
+          ];*/
+          },
+        },
+      },
+      getMonth: function (date) {
+        var monthInt = date.getMonth();
+        var day = date.getDate();
+        var monthsArray = ["Jan", "Feb", "Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        if(day == 1){
+          monthstring = monthsArray[monthInt] + " " + day;
+        }
+        else{
+          monthstring = day;
+        }
+          
+        return monthstring;
+      },
+      getWeek: function(date){
+        var testing = "hello";
+        var test = new Date(date);
+
+        var weekdays = date.getDay();
+        var weekArray = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+        return weekArray[weekdays];
+      }
+
+    });
+
+  </script>
+</dom-module>

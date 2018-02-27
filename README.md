@@ -1,22 +1,6 @@
-<!--
-```
-<custom-element-demo>
-  <template>
-    <link rel="import" href="lrn-calendar.html">
-    <next-code-block></next-code-block>
-  </template>
-</custom-element-demo>
-```
--->
-```html
-<lrn-calendar></lrn-calendar>
-```
+# \<lrn-calendar-date\>
 
-[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/LRNWebComponents/lrn-calendar)
 
-# \<lrn-calendar\>
-
-A LRN element
 
 ## Install the Polymer-CLI
 
