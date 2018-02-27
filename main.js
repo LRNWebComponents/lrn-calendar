@@ -18,7 +18,7 @@
             if(rawFile.readyState === 4){
                 if(rawFile.status === 200 || rawFile.status == 0){
                     allText = rawFile.responseText;
-                    console.log(allText);
+                    //console.log(allText);
                 }
             }
         }
@@ -28,9 +28,22 @@
     return allText;
 };
 
+  Reader.prototype.queueRenderPage = function() {
+    this.createCalendar();
+  };
+
   Reader.prototype.createCalendar = function() {
-    console.log("CREATE CALENDAR");
-    console.log(this.calendarText);
+
+    var elem = document.getElementById("date");
+    while(elem){
+      elem.parentNode.removeChild(elem);
+      console.log("ELEM: " + elem);
+      elem = document.getElementById("date");
+      console.log(elem);
+    }
+
+    //console.log("CREATE CALENDAR");
+    //console.log(this.calendarText);
         var initialDayofWeek = this.currentDayofWeek;
         var days = 1;
         var pastDate = 0;
@@ -169,13 +182,14 @@
         dynamicEl.firstWeek = true;
         dynamicEl.style.width = "14.25%";
         dynamicEl.style.display = "inline-block";
+        dynamicEl.id = "date";
 
         //console.log("InitialDate: " + this.test);
         var eventList = getEvents(this.test, this.calendarText);
-        console.log(eventList);
+        //console.log(eventList);
         var eventsOnDay = eventCheck(eventList,this.test);
-        console.log("EventsONDAY");
-        console.log(eventsOnDay);
+        //console.log("EventsONDAY");
+        //console.log(eventsOnDay);
         var sendEvent = createReturn(eventsOnDay);
         dynamicEl.events = sendEvent;
 
@@ -208,6 +222,7 @@
           }
           var dynamicEl = document.createElement("lrn-calendar-date");
           dynamicEl.valid = true;
+          dynamicEl.id = "date";
           dynamicEl.date = this.newDay; 
           dynamicEl.style.width = "14.25%";
           dynamicEl.style.display = "inline-block";
@@ -362,8 +377,8 @@
           'END:VEVENT',
           'END:VCALENDAR',
         ].join("\r\n"); */
-        console.log("CALENDAR TEST");
-        console.log(text);
+        //console.log("CALENDAR TEST");
+        //console.log(text);
         var iCalendarData = text;
         console.log("ICAL DATA");
         console.log(iCalendarData);
@@ -379,16 +394,6 @@
         var vevents = vcalendar.getAllSubcomponents('vevent');
         var time = vevent.getFirstPropertyValue('dtstamp');
         var description = vevent.getFirstPropertyValue('description');
-
-        //console.log('vevent: ' + time);
-        //console.log('test: ' + test);
-
-        var strData = 'DTSTART:20110914T184000Z'
-        //console.log("time: " + strData);
-        var x = strData.indexOf(":");
-        var strVal = strData.slice(x + 1 );
-        var dateObj = calenDate(strVal);
-        //console.log(dateObj);
 
         var displayEvents = vevents.map(vevent=>{
           event = new ICAL.Event(vevent);

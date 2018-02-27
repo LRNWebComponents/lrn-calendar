@@ -37,10 +37,11 @@ A LRN element
     </style>
 
     <div class="calendar">
-      <div class="testing">
+      <paper-icon-button icon="arrow-back" on-click="showPrev"></paper-icon-button>
+      <paper-icon-button icon="arrow-forward" on-click="showNext"></paper-icon-button>
+      <div class="testing" id="test">
 
         <h1>{{date}}</h1>
-        <!--<canvas class="test-view"></canvas> -->
       </div>
       <!--<form method="post" action="#" onsubmit="return validate()">
       <h1>iCalendar / jCal Validator</h1>
@@ -95,6 +96,9 @@ A LRN element
           type: String,
           value: "month",
         },
+        file:{
+          type: String,
+        },
         
       },
       ready: function() {
@@ -121,8 +125,67 @@ A LRN element
         this.instance.currentDayofWeek = this.startDayOfWeek;
         this.instance.totalDays = (this.numweeks * 7);
         this.instance.view = this.view;
-        this.instance.calendarText = this.instance.readTextFile('sample.ics');
+        this.instance.calendarText = this.instance.readTextFile(this.file);
         this.instance.createCalendar();
+      },
+
+      /*
+      * Is called to show the previous month
+      */
+      showPrev: function() {
+
+        if(this.view == "month"){
+          if (this.date.getMonth() == 0) {
+              var current = new Date(this.date.getFullYear() - 1, 11, this.date.getDate());
+          } else {
+              var current = new Date(this.date.getFullYear(), this.date.getMonth() - 1, this.date.getDate());
+          }
+          this.date = current;
+        }
+        else{
+
+        }
+
+
+        this.instance.startMonth = this.date.getMonth() + 1;
+        this.instance.startYear = this.date.getFullYear();
+        this.instance.startDay = this.date.getDate();
+        this.instance.startDayOfWeek = this.date.getDay();
+        this.instance.currentDate = this.instance.startDay;
+        this.instance.currentMonth = this.instance.startMonth;
+        this.instance.currentYear = this.instance.startYear;
+        this.instance.currentDayofWeek = this.instance.startDayOfWeek;
+        this.instance.totalDays = (this.numweeks * 7);
+        this.instance.view = this.view;
+        console.log("CREATE CALENDAR AGAIN");
+        this.instance.queueRenderPage();
+      },
+
+      /*
+      * Is called to show the next month/week
+      */
+      showNext: function() {
+        if(this.view == "month"){
+          if (this.date.getMonth() == 11) {
+              var current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
+          } else {
+              var current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
+          }
+          this.date = current;
+        }
+
+        this.instance.startMonth = this.date.getMonth() + 1;
+        this.instance.startYear = this.date.getFullYear();
+        this.instance.startDay = this.date.getDate();
+        this.instance.startDayOfWeek = this.date.getDay();
+        this.instance.currentDate = this.instance.startDay;
+        this.instance.currentMonth = this.instance.startMonth;
+        this.instance.currentYear = this.instance.startYear;
+        this.instance.currentDayofWeek = this.instance.startDayOfWeek;
+        this.instance.totalDays = (this.numweeks * 7);
+        this.instance.view = this.view;
+        console.log("CREATE CALENDAR AGAIN");
+        this.instance.queueRenderPage();
       },
 
       createCalendar: function() {
@@ -135,16 +198,12 @@ A LRN element
         this.currentYear = this.startYear;
         this.currentDayofWeek = this.startDayOfWeek;
         this.totalDays = (this.numweeks * 7);
-        this.calendarText = "hello";
         var days = 1;
-        var pastDate = 0;
+        var pastDate = 0;  
 
-        
-
-          
-        
-        
       },
+
+
 
     });
   </script>
