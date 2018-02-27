@@ -3,10 +3,11 @@
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../materializecss-styles/colors.html">
 <link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../hax-body-behaviors/hax-body-behaviors.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../../lrn-calendar-date.html">
+<link rel="import" href="lrn-calendar-date.html">
 <script src="main.js"></script>
-
+<script src="ical.js"></script>
 <!--
 `lrn-calendar`
 A LRN element
@@ -14,16 +15,13 @@ A LRN element
 @demo demo/index.html
 -->
 
-<script type="text/javascript" src="https://rawgit.com/mozilla-comm/ical.js/master/build/ical.js"></script>
-
-
 <dom-module id="lrn-calendar">
   <template>
     <style>
       :host {
         display: block;
       }
-      lrn-calendar-date{
+      lrn-calendar-date {
         display: inline-table;
         top: 0px;
       }
@@ -40,8 +38,7 @@ A LRN element
       <paper-icon-button icon="arrow-back" on-click="showPrev"></paper-icon-button>
       <paper-icon-button icon="arrow-forward" on-click="showNext"></paper-icon-button>
       <div class="testing" id="test">
-
-        <h1>{{date}}</h1>
+      <h2>[[date]]</h2>
       </div>
       <!--<form method="post" action="#" onsubmit="return validate()">
       <h1>iCalendar / jCal Validator</h1>
@@ -62,57 +59,142 @@ A LRN element
       </div>
     </form> -->
     </div>
-
-
-
-    
-
   </template>
-
-
   <script>
-
     Polymer({
-
       is: 'lrn-calendar',
-
+      behaviors: [
+        HAXBehaviors.PropertiesBehaviors,
+      ],
       properties: {
-        title: {
-          type: String,
-          value: 'lrn-calendar',
-        },
+        /**
+         * Date to start from
+         */
         date:{
           type: Date,
+          value: '2018/2/8',
         },
+        /**
+         * Number of weeks to display
+         */
         numweeks: {
           type: Number,
           value: 1
         },
+        /**
+         * Only show week days, no weekends.
+         */
         weekdaysonly: {
           type: Boolean,
           value: false,
         },
+        /**
+         * Type of display, possible values, month, day, week
+         */
         view:{
           type: String,
           value: "month",
         },
+        /**
+         * ical file to reference to pull in dates.
+         */
         file:{
           type: String,
+          value: 'sampleCal.ics',
         },
-        
       },
+      /**
+       * Ready lifecycle.
+       */
       ready: function() {
-
         this.createCalendar();
-
-
-
       },
+      /**
+       * Attached lifecycle.
+       */
       attached: function() {
+        // Establish hax properties if they exist
+        let props = {
+          'canScale': false,
+          'canPosition': false,
+          'canEditSource': false,
+          'gizmo': {
+            'title': 'Calendar',
+            'description': 'Present dates.',
+            'icon': 'icons:today',
+            'color': 'grey',
+            'groups': ['Date'],
+            'handles': [
+              {
+                'type': 'ical',
+                'source': 'file',
+                'date': 'date'
+              }
+            ],
+            'meta': {
+              'author': 'LRNWebComponents'
+            }
+          },
+          'settings': {
+            'quick': [
+              {
+                'property': 'file',
+                'title': 'iCal feed',
+                'description': 'Calendar feed to display',
+                'inputMethod': 'textfield',
+                'icon': 'link',
+                'required': true,
+                'validationType': 'url',
+              },
+              {
+                'property': 'weekdaysonly',
+                'title': 'Weekdays only',
+                'description': 'only show weekdays',
+                'inputMethod': 'boolean',
+                'icon': 'icons:date-range',
+              },
+            ],
+            'configure': [
+              {
+                'property': 'file',
+                'title': 'iCal feed',
+                'description': 'Calendar feed to display',
+                'inputMethod': 'textfield',
+                'icon': 'link',
+                'required': true,
+                'validationType': 'url',
+              },
+              {
+                'property': 'weekdaysonly',
+                'title': 'Weekdays only',
+                'description': 'only show weekdays',
+                'inputMethod': 'boolean',
+                'icon': 'icons:date-range',
+              },
+              {
+                'property': 'view',
+                'title': 'Number of weeks to display',
+                'description': 'Weeks to display at a time',
+                'inputMethod': 'select',
+                'options': {
+                  'day': 'Day',
+                  'week': 'Week',
+                  'month': 'Month',
+                },
+              },
+              {
+                'property': 'numweeks',
+                'title': 'Number of weeks to display',
+                'description': 'Weeks to display at a time',
+                'inputMethod': 'textfield',
+              },
+            ],
+            'advanced': []
+          }
+        };
+        this.setHaxProperties(props);
         this._initializeReader();
-
       },
-
       _initializeReader: function() {
         this.instance = new Polymer.Reader(this);
         this.instance.startMonth = this.date.getMonth() + 1;
@@ -128,12 +210,10 @@ A LRN element
         this.instance.calendarText = this.instance.readTextFile(this.file);
         this.instance.createCalendar();
       },
-
       /*
       * Is called to show the previous month
       */
       showPrev: function() {
-
         if(this.view == "month"){
           if (this.date.getMonth() == 0) {
               var current = new Date(this.date.getFullYear() - 1, 11, this.date.getDate());
@@ -145,8 +225,6 @@ A LRN element
         else{
 
         }
-
-
         this.instance.startMonth = this.date.getMonth() + 1;
         this.instance.startYear = this.date.getFullYear();
         this.instance.startDay = this.date.getDate();
@@ -160,7 +238,6 @@ A LRN element
         console.log("CREATE CALENDAR AGAIN");
         this.instance.queueRenderPage();
       },
-
       /*
       * Is called to show the next month/week
       */
@@ -199,12 +276,8 @@ A LRN element
         this.currentDayofWeek = this.startDayOfWeek;
         this.totalDays = (this.numweeks * 7);
         var days = 1;
-        var pastDate = 0;  
-
+        var pastDate = 0;
       },
-
-
-
     });
   </script>
 </dom-module>
