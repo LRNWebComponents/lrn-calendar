@@ -6,7 +6,6 @@
 <link rel="import" href="../hax-body-behaviors/hax-body-behaviors.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="lrn-calendar-date.html">
-<script src="main.js"></script>
 <script src="ical.js"></script>
 <!--
 `lrn-calendar`
@@ -37,7 +36,12 @@ A LRN element
     <div class="calendar">
       <paper-icon-button icon="arrow-back" on-click="showPrev"></paper-icon-button>
       <paper-icon-button icon="arrow-forward" on-click="showNext"></paper-icon-button>
-      <div class="testing" id="test">
+
+      <button type="button" on-click="showDate">Current Date</button>
+      <button type="button" on-click="monthView">Month</button>
+      <button type="button" on-click="weekView">Week</button>
+
+      <div class="calendarView" id="test">
       <h2>[[date]]</h2>
       </div>
       <!--<form method="post" action="#" onsubmit="return validate()">
@@ -193,9 +197,10 @@ A LRN element
           }
         };
         this.setHaxProperties(props);
-        this._initializeReader();
+        //this._initializeReader();
       },
-      _initializeReader: function() {
+      /*_initializeReader: function() {
+        console.log("Initalize Reader");
         this.instance = new Polymer.Reader(this);
         this.instance.startMonth = this.date.getMonth() + 1;
         this.instance.startYear = this.date.getFullYear();
@@ -208,64 +213,9 @@ A LRN element
         this.instance.totalDays = (this.numweeks * 7);
         this.instance.view = this.view;
         this.instance.calendarText = this.instance.readTextFile(this.file);
-        this.instance.createCalendar();
-      },
-      /*
-      * Is called to show the previous month
-      */
-      showPrev: function() {
-        if(this.view == "month"){
-          if (this.date.getMonth() == 0) {
-              var current = new Date(this.date.getFullYear() - 1, 11, this.date.getDate());
-          } else {
-              var current = new Date(this.date.getFullYear(), this.date.getMonth() - 1, this.date.getDate());
-          }
-          this.date = current;
-        }
-        else{
+        this.instance.createCalendar(); 
 
-        }
-        this.instance.startMonth = this.date.getMonth() + 1;
-        this.instance.startYear = this.date.getFullYear();
-        this.instance.startDay = this.date.getDate();
-        this.instance.startDayOfWeek = this.date.getDay();
-        this.instance.currentDate = this.instance.startDay;
-        this.instance.currentMonth = this.instance.startMonth;
-        this.instance.currentYear = this.instance.startYear;
-        this.instance.currentDayofWeek = this.instance.startDayOfWeek;
-        this.instance.totalDays = (this.numweeks * 7);
-        this.instance.view = this.view;
-        console.log("CREATE CALENDAR AGAIN");
-        this.instance.queueRenderPage();
-      },
-      /*
-      * Is called to show the next month/week
-      */
-      showNext: function() {
-        if(this.view == "month"){
-          if (this.date.getMonth() == 11) {
-              var current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
-          } else {
-              var current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
-          }
-          this.date = current;
-        }
 
-        this.instance.startMonth = this.date.getMonth() + 1;
-        this.instance.startYear = this.date.getFullYear();
-        this.instance.startDay = this.date.getDate();
-        this.instance.startDayOfWeek = this.date.getDay();
-        this.instance.currentDate = this.instance.startDay;
-        this.instance.currentMonth = this.instance.startMonth;
-        this.instance.currentYear = this.instance.startYear;
-        this.instance.currentDayofWeek = this.instance.startDayOfWeek;
-        this.instance.totalDays = (this.numweeks * 7);
-        this.instance.view = this.view;
-        console.log("CREATE CALENDAR AGAIN");
-        this.instance.queueRenderPage();
-      },
-
-      createCalendar: function() {
         this.startMonth = this.date.getMonth() + 1;
         this.startYear = this.date.getFullYear();
         this.startDay = this.date.getDate();
@@ -275,9 +225,498 @@ A LRN element
         this.currentYear = this.startYear;
         this.currentDayofWeek = this.startDayOfWeek;
         this.totalDays = (this.numweeks * 7);
+        this.view = this.view;
+        this.calendarText = this.readTextFile(this.file);
+        this.createCalendar();
+
+      }, */
+      /*
+      * Is called to show the previous month
+      */
+      showPrev: function() {
+        if(this.view == "month"){
+          /*if (this.date.getMonth() == 0) {
+              var current = new Date(this.date.getFullYear() - 1, 11, this.date.getDate());
+          } else {
+              var current = new Date(this.date.getFullYear(), this.date.getMonth() - 1, this.date.getDate());
+          }
+          this.date = current; */
+          var current = new Date(this.date.getFullYear(), this.date.getMonth()-1, this.date.getDate());
+          this.date = current;
+        }
+
+        else{
+          var current = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() - 7);
+          this.date = current;
+        }
+
+        this.startMonth = this.date.getMonth() + 1;
+        this.startYear = this.date.getFullYear();
+        this.startDay = this.date.getDate();
+        this.startDayOfWeek = this.date.getDay();
+        this.currentDate = this.startDay;
+        this.currentMonth = this.startMonth;
+        this.currentYear = this.startYear;
+        this.currentDayofWeek = this.startDayOfWeek;
+        //console.log("CREATE CALENDAR AGAIN");
+        this.queueRenderPage();
+      },
+      /*
+      * Is called to show the next month/week
+      */
+      showNext: function() {
+        if(this.view == "month"){          
+          if (this.date.getMonth() == 11) {
+              var current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
+          } else {
+              var current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
+          }
+          this.date = current;
+        }
+        else{
+          var current = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 7);
+          this.date = current;
+        }
+
+        this.startMonth = this.date.getMonth() + 1;
+        this.startYear = this.date.getFullYear();
+        this.startDay = this.date.getDate();
+        this.startDayOfWeek = this.date.getDay();
+        this.currentDate = this.startDay;
+        this.currentMonth = this.startMonth;
+        this.currentYear = this.startYear;
+        this.currentDayofWeek = this.startDayOfWeek;
+        //console.log("CREATE CALENDAR AGAIN");
+        this.queueRenderPage();
+      },
+
+            /*
+      * Is called to show the next month/week
+      */
+      showDate: function() {
+        var current = new Date();
+        this.date = current;
+
+        this.startMonth = this.date.getMonth() + 1;
+        this.startYear = this.date.getFullYear();
+        this.startDay = this.date.getDate();
+        this.startDayOfWeek = this.date.getDay();
+        this.currentDate = this.startDay;
+        this.currentMonth = this.startMonth;
+        this.currentYear = this.startYear;
+        this.currentDayofWeek = this.startDayOfWeek;
+        //console.log("CREATE CALENDAR AGAIN");
+        this.queueRenderPage();
+      },
+
+      monthView: function() {
+        this.view = "month";
+        //console.log("CREATE CALENDAR AGAIN");
+        this.queueRenderPage();
+      },
+
+      weekView: function() {
+        this.view = "week";
+        //console.log("CREATE CALENDAR AGAIN");
+        this.queueRenderPage();
+      },
+
+      queueRenderPage: function () {
+        this.createCalendar();
+      },
+
+      readTextFile: function(file){
+        console.log("READING FILE");
+        this.fileNotFound = false;
+        var rawFile = new XMLHttpRequest();
+        var allText = '';
+            rawFile.open("GET", file, false);
+            rawFile.onreadystatechange = function ()
+            {
+                if(rawFile.readyState === 4){
+                    if(rawFile.status === 200 || rawFile.status == 0){
+                        allText = rawFile.responseText;
+                        //console.log(allText);
+                    }
+                    else{
+                      console.log("FILE NOT FOUND");
+                      allText = "Not Found";
+                    }
+                }
+            }
+
+
+        rawFile.send(null);
+        this.calendarText = allText;
+        return allText;
+      },
+
+      createCalendar: function() {
+        if(this.view != "month"){
+          if(this.view != "week"){
+            this.view = "month";
+          }
+        }
+        console.log(this.date.getMonth());
+        if(!this.date.getFullYear()){
+          console.log("INVALID DATE");
+
+          this.date = new Date();
+        } 
+        if(this.file == ""){
+          this.file = "test.ics";
+        }
+        console.log(this.date);
+        console.log(this.view);
+        this.startMonth = this.date.getMonth() + 1;
+        this.startYear = this.date.getFullYear();
+        this.startDay = this.date.getDate();
+        this.startDayOfWeek = this.date.getDay();
+        this.currentDate = this.startDay;
+        this.currentMonth = this.startMonth;
+        this.currentYear = this.startYear;
+        this.currentDayofWeek = this.startDayOfWeek;
+        this.totalDays = (this.numweeks * 7);
+        //console.log("ABOUT TO READ TEXT: " + this.date);
+        this.calendarText = this.readTextFile(this.file);
+        this.calendarView = this.querySelector('.calendarView');
+
+
         var days = 1;
         var pastDate = 0;
+
+
+
+
+        var elem = document.getElementById("date");
+        while(elem){
+          elem.parentNode.removeChild(elem);
+          //console.log("ELEM: " + elem);
+          elem = document.getElementById("date");
+          //console.log(elem);
+        }
+
+            var initialDayofWeek = this.currentDayofWeek;
+            var days = 1;
+            var pastDate = 0;
+
+            //Determine how many days until the end of the week
+            if(this.view == "week"){
+              var count = 0;
+              while(this.currentDayofWeek + count < 6){
+                count = count + 1;
+              }
+              this.totalDays = count;
+            }
+            if(this.view == "month"){
+              if(this.currentMonth == 1 || this.currentMonth == 3 || this.currentMonth == 5 || this.currentMonth == 7 || this.currentMonth == 8 || this.currentMonth == 10 || this.currentMonth == 12 ){
+                this.totalDays = 31;
+                this.totalDays = this.totalDays - this.startDay + 1;
+              }
+              else if(this.currentMonth == 4 || this.currentMonth == 6 || this.currentMonth == 9 || this.currentMonth == 11){
+                this.totalDays = 30;
+                this.totalDays = this.totalDays - this.startDay + 1;
+              }
+              else{
+                this.totalDays = 29;
+                this.totalDays = this.totalDays - this.startDay;
+              }
+            }
+            //Sets up days before the actual day to display on calendar
+            this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+            if(this.view == "month"){
+
+              while(this.currentDate != 1){
+                days = days - 1;
+
+                if(this.currentMonth == 1 && this.currentDate == 1){
+                  this.currentYear = this.currentYear - 1;
+                  this.currentMonth = 12;
+                  this.currentDate = 31;
+                  this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+                }
+
+                else {
+                  this.currentDate = this.currentDate - 1;
+
+                  this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+
+                  if(this.test.getDate() != this.currentDate){
+                    //console.log("Date: " + this.currentDate + " Month: " + this.currentMonth);
+                    //31 day months
+                    if((this.currentDate == 0) && (this.currentMonth == 2 || this.currentMonth == 4 || this.currentMonth == 6 || this.currentMonth == 8 || this.currentMonth == 9 || this.currentMonth == 11 || this.currentMonth == 1 )){
+                      this.test = new Date(this.currentYear + '/' + (this.currentMonth - 1) + '/' + 31);
+                      this.currentDate = 31;
+                    }
+                    //30 day months
+                    if((this.currentDate == 0) && (this.currentMonth == 5 || this.currentMonth == 7 || this.currentMonth == 10 || this.currentMonth == 12)){
+                      this.test = new Date(this.currentYear + '/' + (this.currentMonth - 1) + '/' + 30);
+                      this.currentDate = 30;
+                    }
+                    //February
+                    if((this.currentDate == 0) && (this.currentMonth == 3)){
+                      this.test = new Date(this.currentYear + '/' + 2 + '/' + 29);
+                      this.currentDate = 29;
+                      //console.log("This.test " + (this.test.getMonth() + 1));
+                      if(this.test.getMonth() == 2){
+                        //console.log("STILL MARCH");
+                        this.test = new Date(this.currentYear + '/' + 2 + '/' + 28);
+                        this.currentDate = 28;
+                      }
+                    }
+                    //this.currentDate = 31;
+                    this.currentMonth = this.currentMonth - 1;
+                  }
+                }
+
+                
+                if(this.currentDayofWeek == 0 || initialDayofWeek == 0){
+                  this.currentDayofWeek = 7;
+                  initialDayofWeek = -1;
+                }
+                this.currentDayofWeek = this.currentDayofWeek - 1;
+
+              }
+              
+              if(this.currentDayofWeek == 7){
+                this.currentDayofWeek = 0;
+              }
+            }
+
+              while(this.currentDayofWeek != 0){
+                days = days - 1;
+
+                if(this.currentMonth == 1 && this.currentDate == 1){
+                  this.currentYear = this.currentYear - 1;
+                  this.currentMonth = 12;
+                  this.currentDate = 31;
+                  this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+                }
+
+                else {
+                  this.currentDate = this.currentDate - 1;
+
+                  this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+
+                  if(this.test.getDate() != this.currentDate){
+                    //31 day months
+                    if((this.currentDate == 0) && (this.currentMonth == 2 || this.currentMonth == 4 || this.currentMonth == 6 || this.currentMonth == 8 || this.currentMonth == 9 || this.currentMonth == 11 || this.currentMonth == 1 )){
+                      this.test = new Date(this.currentYear + '/' + (this.currentMonth - 1) + '/' + 31);
+                      this.currentDate = 31;
+                    }
+                    //30 day months
+                    if((this.currentDate == 0) && (this.currentMonth == 5 || this.currentMonth == 7 || this.currentMonth == 10 || this.currentMonth == 12)){
+                      this.test = new Date(this.currentYear + '/' + (this.currentMonth - 1) + '/' + 30);
+                      this.currentDate = 30;
+                    }
+                    //February
+                    if((this.currentDate == 0) && (this.currentMonth == 3)){
+                      this.test = new Date(this.currentYear + '/' + 2 + '/' + 29);
+                      this.currentDate = 29;
+                      if(this.test.getMonth() == 2){
+                        this.test = new Date(this.currentYear + '/' + 2 + '/' + 28);
+                        this.currentDate = 28;
+                      }
+                    }
+                    this.currentMonth = this.currentMonth - 1;
+                  }
+                }
+
+                this.currentDayofWeek = this.currentDayofWeek - 1;
+
+              }
+            //}
+
+
+            //Creates first date element
+            var dynamicEl = document.createElement("lrn-calendar-date");
+            dynamicEl.date = this.test;    
+            dynamicEl.firstWeek = true;
+            dynamicEl.style.width = "14.25%";
+            dynamicEl.style.display = "inline-block";
+            dynamicEl.id = "date";
+
+            //console.log("CALENDAR TEXT: " + this.calendarText);
+
+            //console.log("InitialDate: " + this.test);
+            var eventList = this.getEvents(this.test, this.calendarText);
+            //console.log(eventList);
+            var eventsOnDay = this.eventCheck(eventList,this.test);
+            //console.log("EventsONDAY");
+            //console.log(eventsOnDay);
+            var sendEvent = this.createReturn(eventsOnDay);
+            dynamicEl.events = sendEvent;
+
+
+            dynamicEl.valid = true;
+            this.calendarView.appendChild(dynamicEl); 
+
+            var firstWeekCount = 1;
+            while(days<this.totalDays){
+              //If 12/31
+              if(this.currentMonth == 12 && this.currentDate == 31){
+                this.currentYear = this.currentYear + 1;
+                this.currentMonth = 1;
+                this.currentDate = 1;
+                this.newDay = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+              }
+
+              else {
+                this.currentDate = this.currentDate + 1;
+                this.newDay = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+
+                if(this.newDay.getDate() != this.currentDate){
+                  if(this.currentMonth == 1 || this.currentMonth == 3 || this.currentMonth == 5 || this.currentMonth == 7 || this.currentMonth == 8 || this.currentMonth == 10 || this.currentMonth == 12 ){
+
+                    this.newDay = new Date(this.currentYear + '/' + (this.currentMonth + 1) + '/' + 1);
+                  }
+                  this.currentDate = 1;
+                  this.currentMonth = this.currentMonth + 1;
+                }
+              }
+              var dynamicEl = document.createElement("lrn-calendar-date");
+              dynamicEl.valid = true;
+              dynamicEl.id = "date";
+              dynamicEl.date = this.newDay; 
+              dynamicEl.style.width = "14.25%";
+              dynamicEl.style.display = "inline-block";
+
+              
+              var eventsOnDayMain = this.eventCheck(eventList,this.newDay);
+              var sendEventMain = this.createReturn(eventsOnDayMain);
+              dynamicEl.events = sendEventMain;
+
+              if(firstWeekCount < 7){
+                dynamicEl.firstWeek = true;
+              }
+              firstWeekCount = firstWeekCount + 1;
+              dynamicEl.valid = true;
+
+              this.calendarView.appendChild(dynamicEl);
+
+              //console.log("day: " + days + ":  " + this.test);
+
+              days = days + 1;
+              if(days == this.totalDays  && this.newDay.getDay() != 6){
+                days = days - 1;
+                pastDate = 1;
+              }
+              
+
+            }
+
+        },
+
+        getEvents: function(test, text){
+          console.log("get events " + this.file);
+          if(text == "Not Found"){
+            console.log("FILE NOT FOUND IN GET EVENTS");
+            return "";
+          }
+          var iCalendarData = text;
+          //console.log("ICAL DATA");
+          //console.log(iCalendarData);
+
+
+
+
+          var jcalData = ICAL.parse(iCalendarData);
+          //console.log("jcalData: " + jcalData);
+          var vcalendar = new ICAL.Component(jcalData);
+          var vevent = vcalendar.getFirstSubcomponent('vevent');
+          var summary = vevent.getFirstPropertyValue('summary');
+          var vevents = vcalendar.getAllSubcomponents('vevent');
+          var time = vevent.getFirstPropertyValue('dtstamp');
+          var description = vevent.getFirstPropertyValue('description');
+
+          var displayEvents = vevents.map(vevent=>{
+            event = new ICAL.Event(vevent);
+            return event;
+          });
+          var work = [];
+          for(var i =0; i<displayEvents.length; i++){
+            var startDay = this.createDate(displayEvents[i]);
+            //console.log("startDay: " + startDay + " Test: " + test);
+            if(startDay.getTime() >= test.getTime()){
+              //console.log("AFTER START DATE: ");
+              work.push(displayEvents[i]);
+              //console.log(work);
+            }
+            else{
+              //console.log("BEFORE DATE");
+            }
+
+          }
+
+
+          var jCalData = ICAL.parse(iCalendarData);
+          var comp = new ICAL.Component(jCalData);
+          //console.log(jCalData);
+
+          // Fetch the VEVENT part
+          var vevent = comp.getFirstSubcomponent('vevent');
+          var event = new ICAL.Event(vevent);
+
+        
+          //console.log( event);
+          var startDate = event.startDate;
+
+          return work;
+
       },
+
+      calenDate: function(icalStr){
+        // icalStr = '20110914T184000Z'             
+        var strYear = icalStr.substr(0,4);
+        var strMonth = parseInt(icalStr.substr(4,2),10)-1;
+        var strDay = icalStr.substr(6,2);
+        var strHour = icalStr.substr(9,2);
+        var strMin = icalStr.substr(11,2);
+        var strSec = icalStr.substr(13,2);
+
+        var oDate =  new Date(strYear,strMonth, strDay, strHour, strMin, strSec)
+
+        return oDate;
+
+      },
+
+      createDate: function(event){
+        //this.test = new Date(this.currentYear + '/' + this.currentMonth + '/' + this.currentDate);
+        var year = event.startDate._time.year;
+        var month = event.startDate._time.month;
+        var day = event.startDate._time.day;
+        var test = new Date(year + '/' + month + '/' + day);
+        return test;
+      },
+
+      eventCheck: function(event,date){
+        var work = [];
+        for(var i =0; i<event.length; i++){
+          var startDay = this.createDate(event[i]);
+          //console.log(startDay);
+          //console.log("startDay: " + startDay + " Test: " + date);
+          if(startDay.getTime() == date.getTime()){
+            //console.log("Same Day");
+            work.push(event[i]);
+            //console.log(work);
+          }
+          else{
+            //console.log("Not same day");
+          }
+
+        } 
+        return work;
+      },
+
+      createReturn:function(event){
+        //console.log("CREATE RETURN \n\n\n");
+        var test = [];
+        for(var i =0; i<event.length; i++){
+           test.push({"event": event[i].summary, "color": "red"});
+        }
+        return test;
+      },
+
     });
   </script>
 </dom-module>
