@@ -5,7 +5,11 @@
     "polymer": "Polymer/polymer#^1.4.0",
     "hax-body-behaviors": "LRNWebcomponents/hax-body-behaviors#^1.4.0",
     "materializecss-styles": "LRNWebcomponents/materializecss-styles#^1.2.0",
-    "paper-card": "PolymerElements/paper-card#^2.1.0"
+    "paper-card": "PolymerElements/paper-card#^2.1.0",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^2.1.0",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.1.0",
+    "lrnsys-layout": "LRNWebComponents/lrnsys-layout#^1.4.5",
+    "web-animations-js": "^2.3.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

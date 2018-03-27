@@ -22,20 +22,39 @@ A LRN element
       :host {
         display: block;
       }
-      .paper-card {
+      ::-webkit-scrollbar {
+        width: 0px;  /* remove scrollbar space */
+        background: transparent;  /* optional: just make scrollbar invisible */
+      }
+
+
+      .month {
         width: 100%;
-        height: 200px;
+        height: 19vh;
         vertical-align: top;
+        overflow: scroll;
+
+      }
+      .week{
+        width: 100%;
+        height: 50vh;
+        vertical-align: top;
+        overflow: scroll;
       }
       .card-content{
-        height: 2px;
-        top: -20px;
+        position: relative;
+        bottom: 10px;
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 0px 5px;
+        line-height: 7px;
       }
+
 
     </style>
     <body class="main">
       <div id="test">
-        <paper-card class="paper-card">
+        <paper-card class$="{{view}}" id="dateHeader">
           <template is="dom-if" if="[[firstWeek]]">
             <h2>[[getWeek(date)]]</h2>
           </template>
@@ -43,30 +62,21 @@ A LRN element
             <h3> [[getMonth(date)]] </h3>
           
           <template is="dom-repeat" items="{{events}}">
-            <div class = "card-content" style="color:{{item.color}}">
-              <div><span>{{item.event}}</span></div>
-            </div>
+              <div class="card-content">
+                <lrnsys-drawer text="[[timeString(item.event.startDate._time.hour, item.event.startDate._time.minute)]] {{item.event.summary}}" header="[[getDateString(date)]]" align="left" heading-class="orange lighten-3 blue-text text-darken-4">
+                [[displayActivity(item)]] <br /><br />[[displayStart(item)]]<br /><br />[[displayEnd(item)]]
+                </lrnsys-drawer>
+              </div>
           </template>
         </paper-card>
       </div>
     </body>
-
-
-
   </template>
 
   <script>
-
     Polymer({
 
       is: 'lrn-calendar-date',
-
-      /*ready: function() {
-          this.events = [
-            {first: 'Bob', last: 'Smith'},
-            {first: 'Sally', last: 'Johnson'},
-          ];
-        }, */
 
       properties: {
         title: {
@@ -81,8 +91,14 @@ A LRN element
           type: Date,
           
         },
+        loadeddate:{
+          type: Boolean,
+        },
         firstWeek: {
-          type: Boolean
+          type: Boolean,
+        },
+        view:{
+          type: String,
         },
         valid: {
           type: Boolean,
@@ -93,13 +109,10 @@ A LRN element
           type: Array,
           value:function() {
             return[];
-          /*this.events = [
-            {first: 'Sam', last: 'Smith'},
-            {first: 'Juwan', last: 'Johnson'},
-          ];*/
           },
         },
       },
+
       getMonth: function (date) {
         var monthInt = date.getMonth();
         var day = date.getDate();
@@ -120,7 +133,59 @@ A LRN element
         var weekdays = date.getDay();
         var weekArray = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
         return weekArray[weekdays];
-      }
+      },
+      timeString: function(hour, minute){
+        var amPM = (hour > 11) ? "pm" : "am";
+        if(hour > 12) {
+          hour -= 12;
+        } else if(hour == 0) {
+          hour = "12";
+        }
+        if(minute < 10) {
+          minute = "0" + minute;
+        }
+        if(minute == 0){
+          return hour + amPM
+        }
+        return hour + ":" + minute + amPM;
+      },
+
+
+
+      getDateString: function(date){
+        var monthInt = date.getMonth();
+        var day = date.getDate();
+        var monthsArray = ["January", "February", "March","April","May","June","July","August","September","October","November","December"];
+        monthstring = monthsArray[monthInt] + " " + date.getDate() + " " + date.getFullYear();
+          
+        return monthstring;
+      },
+
+      displayInfo: function(e) {
+        var activity = e.event.summary;
+        var startTime = this.timeString(e.event.startDate._time.hour, e.event.startDate._time.minute);
+        var endTime = this.timeString(e.event.endDate._time.hour, e.event.endDate._time.minute);
+        return "Activity: " + activity + "\nStart Time: " + startTime + "\nEnd Time: " + endTime;
+      },
+
+      displayActivity: function(e) {
+        var activity = e.event.summary;
+        var startTime = this.timeString(e.event.startDate._time.hour, e.event.startDate._time.minute);
+        var endTime = this.timeString(e.event.endDate._time.hour, e.event.endDate._time.minute);
+        return "Activity: " + activity;
+      },
+      displayStart: function(e) {
+        var activity = e.event.summary;
+        var startTime = this.timeString(e.event.startDate._time.hour, e.event.startDate._time.minute);
+        var endTime = this.timeString(e.event.endDate._time.hour, e.event.endDate._time.minute);
+        return "Start Time: " + startTime;
+      },
+      displayEnd: function(e) {
+        var activity = e.event.summary;
+        var startTime = this.timeString(e.event.startDate._time.hour, e.event.startDate._time.minute);
+        var endTime = this.timeString(e.event.endDate._time.hour, e.event.endDate._time.minute);
+        return "End Time: " + endTime;
+      },
 
     });
 
