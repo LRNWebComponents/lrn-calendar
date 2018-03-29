@@ -16,14 +16,37 @@
     </style>
   </head>
   <body>
+    <div class="vertical-section-container">
     <h3>Basic lrn-calendar demos</h3>
     <demo-snippet>
       <template>
         
-        <lrn-calendar date="2018/3/25"  file ="sampleCal.ics" view="month"></lrn-calendar>
-        <!--<br /><br /><br /><br />
-        <lrn-calendar date="2018/2/2"  file ="sampleCal.ics" view="month"></lrn-calendar> -->
+        <lrn-calendar date="2018/3/30"  file ="sample2.ics" view="month"></lrn-calendar>
+        <br /><br /><br /><br />
       </template>
     </demo-snippet>
+  </div>
+
+
+  <div class="vertical-section-container">
+    <h3>Basic lrn-calendar demos</h3>
+    <demo-snippet>
+      <template>
+        <paper-button raised id="first">Calendar One</paper-button>
+        <paper-button raised id="second">Calendar Two</paper-button>
+        <lrn-calendar id="cal" date="2018/3/25" view="month"></lrn-calendar>
+        <script>
+            document.querySelector("#first").addEventListener("click", function () {
+              console.log("SELECT 1");
+              document.getElementById("cal").setAttribute("file", "./sampleCal.ics");
+            });
+            document.querySelector("#second").addEventListener("click", function () {
+              document.getElementById("cal").setAttribute("file", "./sample2.ics");
+            });
+          </script>
+      </template>
+    </demo-snippet>
+  </div>
+
   </body>
 </html>

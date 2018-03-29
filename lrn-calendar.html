@@ -17,8 +17,6 @@
 
 
 
-
-
 <script src="ical.js"></script>
 <!--
 `lrn-calendar`
@@ -114,6 +112,7 @@ A LRN element
         file:{
           type: String,
           value: 'sampleCal.ics',
+          reflectToAttribute: true,
         },
       },
       /**
@@ -209,12 +208,29 @@ A LRN element
         this.setHaxProperties(props);
       },
 
+      attributeChanged: function(name, type) {
+        if (name === 'file') {
+          this.createCalendar();
+        }
+      },
+
       /*
       * Is called to show the previous month/week depending on option selected
       */
       showPrev: function() {
+        var current;
         if(this.view == "month"){
-          var current = new Date(this.date.getFullYear(), this.date.getMonth()-1, this.date.getDate());
+          if(this.date.getMonth() == 2){
+            if(this.date.getDate() > 28){
+              current = new Date(this.date.getFullYear(), this.date.getMonth()-1, 28);
+            }
+            else{
+              current = new Date(this.date.getFullYear(), this.date.getMonth()-1, this.date.getDate());
+            }
+          }
+          else{
+            current = new Date(this.date.getFullYear(), this.date.getMonth()-1, this.date.getDate());
+          }
           this.date = current;
         }
 
@@ -234,11 +250,22 @@ A LRN element
       * Is called to show the next month/week
       */
       showNext: function() {
+        var current
         if(this.view == "month"){          
           if (this.date.getMonth() == 11) {
-              var current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
-          } else {
-              var current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
+              current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
+          }
+          else if(this.date.getMonth() == 0){
+            if(this.date.getDate() > 28){
+              current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, 28);
+            }
+            else{
+              current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
+            }
+          }
+
+          else {
+              current = new Date(this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate());
           }
           this.date = current;
         }
