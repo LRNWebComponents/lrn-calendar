@@ -63,7 +63,7 @@ A LRN element
           
           <template is="dom-repeat" items="{{events}}">
               <div class="card-content">
-                <lrnsys-drawer text="[[timeString(item.event.startDate._time.hour, item.event.startDate._time.minute)]] {{item.event.summary}}" header="[[getDateString(date)]]" align="left" heading-class="orange lighten-3 blue-text text-darken-4">
+                <lrnsys-drawer text="[[timeString(item.event.startDate._time.hour, item.event.startDate._time.minute, item.event.endDate._time.hour,item.event.endDate._time.minute)]] {{item.event.summary}}" header="[[getDateString(date)]]" align="left" heading-class="orange lighten-3 blue-text text-darken-4">
                 [[displayActivity(item)]] <br /><br />[[displayStart(item)]]<br /><br />[[displayEnd(item)]]
                 </lrnsys-drawer>
               </div>
@@ -134,20 +134,27 @@ A LRN element
         var weekArray = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
         return weekArray[weekdays];
       },
-      timeString: function(hour, minute){
-        var amPM = (hour > 11) ? "pm" : "am";
-        if(hour > 12) {
-          hour -= 12;
-        } else if(hour == 0) {
-          hour = "12";
+      timeString: function(startHour, startMinute, endHour, endMinute){
+        var amPM = (startHour > 11) ? "pm" : "am";
+        if(startHour > 12) {
+          startHour -= 12;
+        } else if(startHour == 0) {
+          if(startMinute == 0 && endHour == 0 && endMinute == 0){
+            var test = "All DAY";
+            return test;
+          }
+          else{
+            startHour = "12";
+
+          }
         }
-        if(minute < 10) {
-          minute = "0" + minute;
+        if(startMinute < 10) {
+          startMinute = "0" + startMinute;
         }
-        if(minute == 0){
-          return hour + amPM
+        if(startMinute == 0){
+          return startHour + amPM
         }
-        return hour + ":" + minute + amPM;
+        return startHour + ":" + startMinute + amPM;
       },
 
 

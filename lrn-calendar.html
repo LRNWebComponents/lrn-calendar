@@ -119,6 +119,8 @@ A LRN element
        * Ready lifecycle.
        */
       ready: function() {
+        this.listOfEvents = [];
+        this.loadFile();
         this.createCalendar();
       },
       /**
@@ -210,8 +212,16 @@ A LRN element
 
       attributeChanged: function(name, type) {
         if (name === 'file') {
+          this.loadFile();
           this.createCalendar();
         }
+      },
+
+      loadFile: function(){
+        this.calendarText = this.readTextFile(this.file);
+        this.listOfEvents = this.getEvents(this.date, this.calendarText);
+        this.listOfEvents = this.sortByTime(this.listOfEvents);
+        console.log(this.listOfEvents);
       },
 
       /*
@@ -504,8 +514,8 @@ A LRN element
           dynamicEl.loadeddate = true;
         }
 
-        var eventList = this.getEvents(this.newDate, this.calendarText);
-        var eventsOnDay = this.eventCheck(eventList,this.newDate);
+        //var eventList = this.getEvents(this.newDate, this.calendarText);
+        var eventsOnDay = this.eventCheck(this.listOfEvents,this.newDate);
         var sendEvent = this.createReturn(eventsOnDay);
         dynamicEl.events = sendEvent;
 
@@ -549,7 +559,7 @@ A LRN element
               this.date.getDate() === this.newDay.getDate()){
             dynamicEl.loadeddate = true;
           }    
-          var eventsOnDayMain = this.eventCheck(eventList,this.newDay);
+          var eventsOnDayMain = this.eventCheck(this.listOfEvents,this.newDay);
           var sendEventMain = this.createReturn(eventsOnDayMain);
           dynamicEl.events = sendEventMain;
           
@@ -579,37 +589,76 @@ A LRN element
         if(text == "Not Found"){   
           return "";
         }
-        var iCalendarData = text;       
+        var iCalendarData = text;
         var jcalData = ICAL.parse(iCalendarData);
         var vcalendar = new ICAL.Component(jcalData);
         var vevent = vcalendar.getFirstSubcomponent('vevent');
-        var summary = vevent.getFirstPropertyValue('summary');
         var vevents = vcalendar.getAllSubcomponents('vevent');
-        var time = vevent.getFirstPropertyValue('dtstamp');
-        var description = vevent.getFirstPropertyValue('description');
+
 
         var displayEvents = vevents.map(vevent=>{
           event = new ICAL.Event(vevent);
           return event;
         });
-        var work = [];
+        this.eventArray = [];
         for(var i =0; i<displayEvents.length; i++){
           var startDay = this.createDate(displayEvents[i]);
-          
-          if(startDay.getTime() >= date.getTime()){  
-            work.push(displayEvents[i]);   
+          if(displayEvents[i].isRecurring()){
+            this.createRecurrence(displayEvents[i]);
+            
           }
+            this.eventArray.push(displayEvents[i]);   
         }
 
-        var jCalData = ICAL.parse(iCalendarData);
-        var comp = new ICAL.Component(jCalData);
-        
-        // Fetch the VEVENT part
-        var vevent = comp.getFirstSubcomponent('vevent');
-        var event = new ICAL.Event(vevent); 
-        var startDate = event.startDate;
+        return this.eventArray;
+      },
 
-        return work;
+      /*
+      * Determines what type of recurrence is occuring and calls createRepeatedEvent
+      * The int in the function call is the max number of recurrences
+      */
+      createRecurrence: function(events){
+        if(events.getRecurrenceTypes().WEEKLY){
+          this.createRepeatedEvent(events, 156);
+        }
+        else if(events.getRecurrenceTypes().DAILY){
+          this.createRepeatedEvent(events, 720);
+        }
+        else if(events.getRecurrenceTypes().MONTHLY){
+          this.createRepeatedEvent(events, 36);
+        }
+        else if(events.getRecurrenceTypes().YEARLY){
+          this.createRepeatedEvent(events, 10);
+        }
+
+      },
+
+      /*
+      * Iterates through the recurring event.  Each time it creates a new event.  
+      * Currently it sets the summary and description the same since that will not change
+      * That will need to be adjusted, only info in new Event is start time, end time, summary, and description
+      * The new event is loaded into the array of all the events
+      */
+      createRepeatedEvent: function(events,maxRepeat){
+        var iter = events.iterator(events.startDate);
+
+        let next;
+        let num = 0;
+        while ((next = iter.next()) && num++ < maxRepeat) {
+          var newTest = new ICAL.Event();
+
+          newTest.summary = events.summary;
+          newTest.description = events.description;
+          newTest.startDate = events.getOccurrenceDetails(next).startDate;
+          newTest.endDate = events.getOccurrenceDetails(next).endDate;
+          if(newTest.startDate._time.day != events.startDate._time.day || newTest.startDate._time.month != events.startDate._time.month || newTest.startDate._time.year != events.startDate._time.year){
+            this.eventArray.push(newTest);
+          }
+          
+          
+        }
+        return;
+
       },
 
       /*
@@ -648,14 +697,14 @@ A LRN element
         do {
             swapped = false;
             for (var i=0; i < eventList.length-1; i++) {
-                if (eventList[i].event.startDate._time.hour > eventList[i+1].event.startDate._time.hour) {
+                if (eventList[i].startDate._time.hour > eventList[i+1].startDate._time.hour) {
                     var temp = eventList[i];
                     eventList[i] = eventList[i+1];
                     eventList[i+1] = temp;
                     swapped = true;
                 }
-                if(eventList[i].event.startDate._time.hour == eventList[i+1].event.startDate._time.hour){
-                  if(eventList[i].event.startDate._time.minute > eventList[i+1].event.startDate._time.minute){
+                if(eventList[i].startDate._time.hour == eventList[i+1].startDate._time.hour){
+                  if(eventList[i].startDate._time.minute > eventList[i+1].startDate._time.minute){
                     var temp = eventList[i];
                     eventList[i] = eventList[i+1];
                     eventList[i+1] = temp;
@@ -687,7 +736,6 @@ A LRN element
         for(var i =0; i<event.length; i++){
           EventArray.push({"event": event[i]});
         }
-        EventArray = this.sortByTime(EventArray);
         return EventArray;
       },
 
