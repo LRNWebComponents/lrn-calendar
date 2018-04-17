@@ -218,6 +218,7 @@ A LRN element
       },
 
       loadFile: function(){
+        this.startIndex = 0;
         this.calendarText = this.readTextFile(this.file);
         this.listOfEvents = this.getEvents(this.date, this.calendarText);
         this.listOfEvents = this.sortByTime(this.listOfEvents);
@@ -229,6 +230,7 @@ A LRN element
       */
       showPrev: function() {
         var current;
+        this.startIndex = 0;
         if(this.view == "month"){
           if(this.date.getMonth() == 2){
             if(this.date.getDate() > 28){
@@ -292,9 +294,9 @@ A LRN element
       * Is called to show the next month/week
       */
       showDate: function() {
+        this.startIndex = 0;
         var current = new Date();
         this.date = current;
-
         this.getDateInfo();
         this.createCalendar();
       },
@@ -515,6 +517,7 @@ A LRN element
         }
 
         //var eventList = this.getEvents(this.newDate, this.calendarText);
+        
         var eventsOnDay = this.eventCheck(this.listOfEvents,this.newDate);
         var sendEvent = this.createReturn(eventsOnDay);
         dynamicEl.events = sendEvent;
@@ -651,6 +654,8 @@ A LRN element
           newTest.description = events.description;
           newTest.startDate = events.getOccurrenceDetails(next).startDate;
           newTest.endDate = events.getOccurrenceDetails(next).endDate;
+          var locationString = String(events.location);
+          newTest.location = locationString;
           if(newTest.startDate._time.day != events.startDate._time.day || newTest.startDate._time.month != events.startDate._time.month || newTest.startDate._time.year != events.startDate._time.year){
             this.eventArray.push(newTest);
           }
@@ -677,11 +682,18 @@ A LRN element
       */
       eventCheck: function(event,date){
         var eventsOnDay = [];
-        for(var i =0; i<event.length; i++){
+        var end = event.length;
+        for(var i =this.startIndex; i<end; i++){
           var startDay = this.createDate(event[i]);
           
+          if(startDay.getTime() > date.getTime()){
+            end = i;
+            if(i != 0){
+              this.startIndex = i - 1;
+            }
+          }
+          
           if(startDay.getTime() == date.getTime()){
-            
             eventsOnDay.push(event[i]);
             
           }
@@ -697,20 +709,12 @@ A LRN element
         do {
             swapped = false;
             for (var i=0; i < eventList.length-1; i++) {
-                if (eventList[i].startDate._time.hour > eventList[i+1].startDate._time.hour) {
-                    var temp = eventList[i];
-                    eventList[i] = eventList[i+1];
-                    eventList[i+1] = temp;
-                    swapped = true;
-                }
-                if(eventList[i].startDate._time.hour == eventList[i+1].startDate._time.hour){
-                  if(eventList[i].startDate._time.minute > eventList[i+1].startDate._time.minute){
-                    var temp = eventList[i];
-                    eventList[i] = eventList[i+1];
-                    eventList[i+1] = temp;
-                    swapped = true;
-                  }
-                }
+              if(eventList[i].startDate>eventList[i+1].startDate){
+                var temp = eventList[i];
+                eventList[i] = eventList[i+1];
+                eventList[i+1] = temp;
+                swapped = true;
+              }
             }
         } while (swapped);
         return eventList;
