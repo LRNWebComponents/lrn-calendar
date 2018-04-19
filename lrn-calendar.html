@@ -86,20 +86,6 @@ A LRN element
           value: '2018/2/8',
         },
         /**
-         * Number of weeks to display
-         */
-        numweeks: {
-          type: Number,
-          value: 1
-        },
-        /**
-         * Only show week days, no weekends.
-         */
-        weekdaysonly: {
-          type: Boolean,
-          value: false,
-        },
-        /**
          * Type of display, possible values, month, day, week
          */
         view:{
@@ -159,14 +145,6 @@ A LRN element
                 'inputMethod': 'textfield',
                 'icon': 'link',
                 'required': true,
-                'validationType': 'url',
-              },
-              {
-                'property': 'weekdaysonly',
-                'title': 'Weekdays only',
-                'description': 'only show weekdays',
-                'inputMethod': 'boolean',
-                'icon': 'icons:date-range',
               },
             ],
             'configure': [
@@ -180,28 +158,20 @@ A LRN element
                 'validationType': 'url',
               },
               {
-                'property': 'weekdaysonly',
-                'title': 'Weekdays only',
-                'description': 'only show weekdays',
-                'inputMethod': 'boolean',
-                'icon': 'icons:date-range',
-              },
-              {
                 'property': 'view',
-                'title': 'Number of weeks to display',
-                'description': 'Weeks to display at a time',
+                'title': 'View calendar in week or month format',
+                'description': 'week or month view',
                 'inputMethod': 'select',
                 'options': {
-                  'day': 'Day',
                   'week': 'Week',
                   'month': 'Month',
                 },
               },
               {
-                'property': 'numweeks',
-                'title': 'Number of weeks to display',
-                'description': 'Weeks to display at a time',
-                'inputMethod': 'textfield',
+                'property': 'date',
+                'title': 'Date: yyyy/mm/dd',
+                'description': 'Date to display calendar',
+                'inputMethod': 'datepicker', 
               },
             ],
             'advanced': []
@@ -213,6 +183,11 @@ A LRN element
       attributeChanged: function(name, type) {
         if (name === 'file') {
           this.loadFile();
+          this.createCalendar();
+        }
+        else if(name === 'date'){
+        }
+        else{
           this.createCalendar();
         }
       },
@@ -304,6 +279,7 @@ A LRN element
       //Set the view to month
       monthView: function() {
         this.view = "month";
+        this.startIndex = 0;
         
         this.createCalendar();
       },
@@ -311,6 +287,7 @@ A LRN element
       //Set the view to weekly
       weekView: function() {
         this.view = "week";
+        this.startIndex = 0;
         
         this.createCalendar();
       },
@@ -679,6 +656,10 @@ A LRN element
 
       /*
       * Check if the event occurs on this date and then includes it in the event array that is returned
+      * this.startIndex determines the index of the event array that it should start looking for the events that occur
+      * on that day.  This is to increase efficiency to not keep scrolling through the list
+      * Once an event is found after the date, it exits the for loop
+      * This is all because the event array is sorted by date
       */
       eventCheck: function(event,date){
         var eventsOnDay = [];
@@ -747,7 +728,8 @@ A LRN element
       * Gets the date to display on the header, currently the month and year. Returns it as a String
       */
       getDisplayDate: function (date) {
-        var monthInt = date.getMonth();    
+        var dateFormat = new Date(date);
+        var monthInt = date.getMonth(); 
         var day = date.getDate();
         var monthsArray = ["January", "February", "March","April","May","June","July","August","September","October","November","December"];
         monthstring = monthsArray[monthInt] + " " + date.getFullYear();

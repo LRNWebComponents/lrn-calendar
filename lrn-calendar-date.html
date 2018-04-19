@@ -30,14 +30,14 @@ A LRN element
 
       .month {
         width: 100%;
-        height: 19vh;
+        height: 20vh;
         vertical-align: top;
         overflow: scroll;
 
       }
       .week{
         width: 100%;
-        height: 50vh;
+        height: 40vh;
         vertical-align: top;
         overflow: scroll;
       }
@@ -49,17 +49,24 @@ A LRN element
         padding: 0px 5px;
         line-height: 7px;
       }
+      .label{
+        width: 100%
+      }
 
 
     </style>
     <body class="main">
       <div id="test">
-        <paper-card class$="{{view}}" id="dateHeader">
+        <div>
           <template is="dom-if" if="[[firstWeek]]">
-            <h2>[[getWeek(date)]]</h2>
+            <paper-card class="label">
+            <h3>[[getWeek(date)]]</h2>
+            </paper-card>
           </template>
+        </div>
+        <paper-card class$="{{view}}" id="dateHeader">
           
-            <h3> [[getMonth(date)]] </h3>
+            <h5> [[getMonth(date)]] </h3>
           
           <template is="dom-repeat" items="{{events}}">
               <div class="card-content">
