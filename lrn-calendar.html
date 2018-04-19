@@ -7,17 +7,15 @@
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="lrn-calendar-date.html">
 <link rel="import" href="../lrnsys-layout/lrnsys-layout.html">
 <link rel="import" href="../lrnsys-layout/lrnsys-drawer.html">
 <link rel="import" href="../lrnsys-layout/lrnsys-dialog.html">
 <link rel="import" href="../lrnsys-layout/lrnsys-collapselist.html">
 <link rel="import" href="../lrnsys-layout/lrnsys-collapselist-item.html">
 <link rel="import" href="../web-animations-js/web-animations-next.min.html">
+<link rel="import" href="lrn-calendar-date.html">
+<link rel="import" href="i-cal-js.html">
 
-
-
-<script src="ical.js"></script>
 <!--
 `lrn-calendar`
 A LRN element
@@ -53,13 +51,13 @@ A LRN element
     <div class="calendar">
       <div class="header">
         <div style="float: left">
-          <paper-button raised type="button" on-click="monthView">Month</paper-button>
-          <paper-button raised type="button" on-click="weekView">Week</paper-button>
+          <paper-button raised type="button" on-tap="monthView">Month</paper-button>
+          <paper-button raised type="button" on-tap="weekView">Week</paper-button>
         </div>
         <div style="float: right">
-          <paper-button raised type="button" on-click="showDate">Today</paper-button>
-          <paper-icon-button icon="arrow-back" on-click="showPrev"></paper-icon-button>
-          <paper-icon-button icon="arrow-forward" on-click="showNext"></paper-icon-button>
+          <paper-button raised type="button" on-tap="showDate">Today</paper-button>
+          <paper-icon-button icon="arrow-back" on-tap="showPrev"></paper-icon-button>
+          <paper-icon-button icon="arrow-forward" on-tap="showNext"></paper-icon-button>
         </div>
         <div style="margin: 0 auto; width: 200px; text-align: center">
           <h2>[[getDisplayDate(date)]]</h2>
@@ -67,7 +65,6 @@ A LRN element
       </div>
 
       <div class="calendarView" id="calView">
-      
       </div>
     </div>
   </template>
@@ -79,11 +76,26 @@ A LRN element
       ],
       properties: {
         /**
+         * An array of events for display
+         */
+        listOfEvents: {
+          type: Array,
+          value: [],
+        },
+        /**
+         * Date to start from
+         */
+        dateString:{
+          type: String,
+          observer: '_dateStringChanged',
+        },
+        /**
          * Date to start from
          */
         date:{
           type: Date,
-          value: '2018/2/8',
+          value: new Date(),
+          observer: '_dateChanged',
         },
         /**
          * Type of display, possible values, month, day, week
@@ -91,23 +103,52 @@ A LRN element
         view:{
           type: String,
           value: "month",
+          observer: '_viewTypeChanged',
         },
         /**
          * ical file to reference to pull in dates.
          */
         file:{
           type: String,
-          value: 'sampleCal.ics',
           reflectToAttribute: true,
+          observer: '_fileChanged',
         },
       },
       /**
-       * Ready lifecycle.
+       * Notice the file has changed and attempt to rebind.
        */
-      ready: function() {
-        this.listOfEvents = [];
-        this.loadFile();
-        this.createCalendar();
+      _fileChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined) {
+          this.loadFile();
+          this.getDateInfo();
+          this.createCalendar();
+        }
+      },
+      /**
+       * Notice the file has changed and attempt to rebind.
+       */
+      _viewTypeChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && typeof this.file !== typeof undefined) {
+          this.getDateInfo();
+          this.createCalendar();
+        }
+      },
+      /**
+       * Notice the file has changed and attempt to rebind.
+       */
+      _dateChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && typeof this.file !== typeof undefined) {
+          this.getDateInfo();
+          this.createCalendar();
+        }
+      },
+      /**
+       * Notice the String of the date has changed and reset the actual date to it
+       */
+      _dateStringChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && newValue != '') {
+          this.date = new Date(newValue);
+        }
       },
       /**
        * Attached lifecycle.
@@ -168,10 +209,10 @@ A LRN element
                 },
               },
               {
-                'property': 'date',
+                'property': 'dateString',
                 'title': 'Date: yyyy/mm/dd',
                 'description': 'Date to display calendar',
-                'inputMethod': 'datepicker', 
+                'inputMethod': 'datepicker',
               },
             ],
             'advanced': []
@@ -179,25 +220,14 @@ A LRN element
         };
         this.setHaxProperties(props);
       },
-
-      attributeChanged: function(name, type) {
-        if (name === 'file') {
-          this.loadFile();
-          this.createCalendar();
-        }
-        else if(name === 'date'){
-        }
-        else{
-          this.createCalendar();
-        }
-      },
-
+      /**
+       * Load the ical file.
+       */
       loadFile: function(){
         this.startIndex = 0;
         this.calendarText = this.readTextFile(this.file);
         this.listOfEvents = this.getEvents(this.date, this.calendarText);
         this.listOfEvents = this.sortByTime(this.listOfEvents);
-        console.log(this.listOfEvents);
       },
 
       /*
@@ -237,8 +267,8 @@ A LRN element
       * Is called to show the next month/week
       */
       showNext: function() {
-        var current
-        if(this.view == "month"){          
+        var current;
+        if(this.view == "month"){
           if (this.date.getMonth() == 11) {
               current = new Date(this.date.getFullYear() + 1, 0, this.date.getDate());
           }
@@ -265,13 +295,12 @@ A LRN element
         this.createCalendar();
       },
 
-      /*
-      * Is called to show the next month/week
-      */
+      /**
+       * Is called to show the next month/week
+       */
       showDate: function() {
         this.startIndex = 0;
-        var current = new Date();
-        this.date = current;
+        this.date = new Date();
         this.getDateInfo();
         this.createCalendar();
       },
@@ -280,7 +309,6 @@ A LRN element
       monthView: function() {
         this.view = "month";
         this.startIndex = 0;
-        
         this.createCalendar();
       },
 
@@ -288,12 +316,10 @@ A LRN element
       weekView: function() {
         this.view = "week";
         this.startIndex = 0;
-        
         this.createCalendar();
       },
 
       readTextFile: function(file){
-        
         this.fileNotFound = false;
         var rawFile = new XMLHttpRequest();
         var allText = '';
@@ -324,7 +350,6 @@ A LRN element
       * Does the math required to get all the days correct. Ex: Oct 31 -> Nov 1
       */
       createCalendar: function() {
-        
         if(this.view != "month"){
           if(this.view != "week"){
             this.view = "month";
@@ -332,9 +357,6 @@ A LRN element
         }
         if(!this.date.getFullYear()){
           this.date = new Date();
-        } 
-        if(this.file == ""){
-          this.file = "test.ics";
         }
 
         this.getDateInfo();
@@ -636,8 +658,6 @@ A LRN element
           if(newTest.startDate._time.day != events.startDate._time.day || newTest.startDate._time.month != events.startDate._time.month || newTest.startDate._time.year != events.startDate._time.year){
             this.eventArray.push(newTest);
           }
-          
-          
         }
         return;
 
@@ -661,24 +681,21 @@ A LRN element
       * Once an event is found after the date, it exits the for loop
       * This is all because the event array is sorted by date
       */
-      eventCheck: function(event,date){
+      eventCheck: function(events, date){
         var eventsOnDay = [];
-        var end = event.length;
-        for(var i =this.startIndex; i<end; i++){
-          var startDay = this.createDate(event[i]);
-          
+        var end = events.length;
+        for(var i = this.startIndex; i<end; i++){
+          var startDay = this.createDate(events[i]);
           if(startDay.getTime() > date.getTime()){
             end = i;
             if(i != 0){
               this.startIndex = i - 1;
             }
           }
-          
           if(startDay.getTime() == date.getTime()){
-            eventsOnDay.push(event[i]);
-            
+            eventsOnDay.push(events[i]);
           }
-        } 
+        }
         return eventsOnDay;
       },
 
@@ -728,13 +745,14 @@ A LRN element
       * Gets the date to display on the header, currently the month and year. Returns it as a String
       */
       getDisplayDate: function (date) {
-        var dateFormat = new Date(date);
-        var monthInt = date.getMonth(); 
-        var day = date.getDate();
-        var monthsArray = ["January", "February", "March","April","May","June","July","August","September","October","November","December"];
-        monthstring = monthsArray[monthInt] + " " + date.getFullYear();
-          
-        return monthstring;
+        if (typeof date.getMonth === 'function') {
+          var monthInt = date.getMonth();
+          var day = date.getDate();
+          var monthsArray = ["January", "February", "March","April","May","June","July","August","September","October","November","December"];
+          monthstring = monthsArray[monthInt] + " " + date.getFullYear();
+          return monthstring;
+        }
+        return '';
       },
 
     });
